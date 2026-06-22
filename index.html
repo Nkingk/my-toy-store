@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teddy & Co. Toy Store</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background-color: #f9f6f0; color: #333; }
+        header { background-color: #ff6b6b; padding: 1rem; display: flex; justify-content: space-between; align-items: center; color: white; }
+        .hero { background: linear-gradient(135deg, #4ecdc4, #2ab7ca); color: white; text-align: center; padding: 4rem 1rem; }
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+        .toy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-top: 2rem; }
+        .toy-card { background: white; padding: 1.5rem; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .toy-img { font-size: 4rem; margin-bottom: 1rem; }
+        .btn { background: #4ecdc4; color: white; border: none; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <header>
+        <h2>🧸 Teddy & Co.</h2>
+        <div>Cart (0)</div>
+    </header>
+    <section class="hero">
+        <h1>The Toy Store is Live!</h1>
+        <p>Your official GitHub Pages storefront.</p>
+    </section>
+    <main class="container">
+        <div class="toy-grid">
+            <div class="toy-card"><div class="toy-img">🚀</div><h3>Rocket Ship</h3><button class="btn">Buy</button></div>
+            <div class="toy-card"><div class="toy-img">🧸</div><h3>Teddy Bear</h3><button class="btn">Buy</button></div>
+            <div class="toy-card"><div class="toy-img">🚂</div><h3>Train Set</h3><button class="btn">Buy</button></div>
+        </div>
+    </main>
+</body>
+</html>
