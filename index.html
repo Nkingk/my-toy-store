@@ -5,32 +5,220 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teddy & Co. Toy Store</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        body { background-color: #f9f6f0; color: #333; }
-        header { background-color: #ff6b6b; padding: 1rem; display: flex; justify-content: space-between; align-items: center; color: white; }
-        .hero { background: linear-gradient(135deg, #4ecdc4, #2ab7ca); color: white; text-align: center; padding: 4rem 1rem; }
-        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
-        .toy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-top: 2rem; }
-        .toy-card { background: white; padding: 1.5rem; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .toy-img { font-size: 4rem; margin-bottom: 1rem; }
-        .btn { background: #4ecdc4; color: white; border: none; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #fceddb; color: #4a4a4a; }
+        
+        /* Header styling */
+        header { 
+            background-color: #ff6b6b; 
+            padding: 1.2rem 2rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .cart-box {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .cart-box.bounce { transform: scale(1.15); }
+
+        /* Hero Section */
+        .hero { 
+            background: linear-gradient(135deg, #4ecdc4, #2ab7ca); 
+            color: white; 
+            text-align: center; 
+            padding: 6rem 1rem; 
+            box-shadow: inset 0 -10px 20px rgba(0,0,0,0.05);
+        }
+        .hero h1 { font-size: 3rem; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+        .hero p { font-size: 1.3rem; opacity: 0.9; }
+
+        /* Main Container */
+        .container { max-width: 1200px; margin: 3rem auto; padding: 0 1.5rem; }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            color: #ff6b6b;
+        }
+
+        /* Toy Grid Cards */
+        .toy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2.5rem; margin-top: 2rem; }
+        .toy-card { 
+            background: white; 
+            border-radius: 16px; 
+            text-align: center; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.06); 
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .toy-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+        }
+        .toy-img-container {
+            width: 100%;
+            height: 220px;
+            overflow: hidden;
+            background-color: #f5f5f5;
+        }
+        .toy-img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .toy-card:hover .toy-img {
+            transform: scale(1.08);
+        }
+        .toy-info {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+        .toy-info h3 { font-size: 1.4rem; margin-bottom: 0.5rem; color: #333; }
+        .price { font-size: 1.2rem; font-weight: bold; color: #2ab7ca; margin-bottom: 1rem; }
+        
+        .btn { 
+            background: #ff6b6b; 
+            color: white; 
+            border: none; 
+            padding: 0.7rem 1.5rem; 
+            border-radius: 25px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 1rem;
+            transition: background 0.2s, transform 0.1s;
+            width: 100%;
+        }
+        .btn:hover { background: #ee5252; }
+        .btn:active { transform: scale(0.98); }
+
+        /* Video Showcase Section */
+        .video-section {
+            background-color: white;
+            padding: 4rem 1.5rem;
+            margin-top: 4rem;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.02);
+        }
+        .video-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            position: relative;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
     </style>
 </head>
 <body>
+
     <header>
         <h2>🧸 Teddy & Co.</h2>
-        <div>Cart (0)</div>
+        <div class="cart-box" id="cart">Cart (0)</div>
     </header>
+
     <section class="hero">
-        <h1>The Toy Store is Live!</h1>
-        <p>Your official GitHub Pages storefront.</p>
+        <h1>The Ultimate Toy Store is Live!</h1>
+        <p>Explore our premium, interactive collection directly on GitHub Pages.</p>
     </section>
+
     <main class="container">
+        <h2 class="section-title">Featured Toys</h2>
         <div class="toy-grid">
-            <div class="toy-card"><div class="toy-img">🚀</div><h3>Rocket Ship</h3><button class="btn">Buy</button></div>
-            <div class="toy-card"><div class="toy-img">🧸</div><h3>Teddy Bear</h3><button class="btn">Buy</button></div>
-            <div class="toy-card"><div class="toy-img">🚂</div><h3>Train Set</h3><button class="btn">Buy</button></div>
+            <!-- Toy 1 -->
+            <div class="toy-card">
+                <div class="toy-img-container">
+                    <img class="toy-img" src="https://images.unsplash.com/photo-1534447677768-be436bb09401?w=500&q=80" alt="Wooden Rocket Ship">
+                </div>
+                <div class="toy-info">
+                    <div>
+                        <h3>Retro Rocket Ship</h3>
+                        <p class="price">$24.99</p>
+                    </div>
+                    <button class="btn add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+
+            <!-- Toy 2 -->
+            <div class="toy-card">
+                <div class="toy-img-container">
+                    <img class="toy-img" src="https://images.unsplash.com/photo-1559251606-c623743a6d76?w=500&q=80" alt="Classic Teddy Bear">
+                </div>
+                <div class="toy-info">
+                    <div>
+                        <h3>Classic Teddy Bear</h3>
+                        <p class="price">$19.99</p>
+                    </div>
+                    <button class="btn add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+
+            <!-- Toy 3 -->
+            <div class="toy-card">
+                <div class="toy-img-container">
+                    <img class="toy-img" src="https://images.unsplash.com/photo-1515488042361-404e9250afef?w=500&q=80" alt="Wooden Train Set">
+                </div>
+                <div class="toy-info">
+                    <div>
+                        <h3>Vintage Train Set</h3>
+                        <p class="price">$34.99</p>
+                    </div>
+                    <button class="btn add-to-cart">Add to Cart</button>
+                </div>
+            </div>
         </div>
     </main>
+
+    <!-- Video Section -->
+    <section class="video-section">
+        <h2 class="section-title">See Our Toys in Action</h2>
+        <div class="video-container">
+            <!-- Embedded YouTube Video -->
+            <iframe src="https://www.youtube.com/embed/Z57EPrCWe38" title="Toy Store Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <script>
+        // Simple Interactive Cart Logic
+        let cartCount = 0;
+        const cartElement = document.getElementById('cart');
+        const buttons = document.querySelectorAll('.add-to-cart');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                cartCount++;
+                cartElement.textContent = `Cart (${cartCount})`;
+                
+                // Add a quick visual bounce animation to the cart badge
+                cartElement.classList.add('bounce');
+                setTimeout(() => {
+                    cartElement.classList.remove('bounce');
+                }, 200);
+            });
+        });
+    </script>
 </body>
 </html>
