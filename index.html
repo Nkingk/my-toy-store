@@ -3,221 +3,576 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teddy & Co. Toy Store</title>
+    <title>Teddy & Co. | Heirloom Wooden Toys & Organic Plush</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #fceddb; color: #4a4a4a; }
+        /* --- DESIGN SYSTEM & VARIABLES --- */
+        :root {
+            --primary: #2C3E50;       /* Deep Navy */
+            --primary-light: #34495E;
+            --accent: #D4A373;        /* Warm Wood / Gold */
+            --accent-hover: #C58B53;
+            --bg-main: #FAFAFA;       /* Off-white */
+            --bg-alt: #F3F0EB;        /* Warm Gray/Beige */
+            --text-dark: #1A1A1A;
+            --text-muted: #666666;
+            --border-color: #EAEAEA;
+            --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-serif: 'Playfair Display', Georgia, serif;
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-main); background-color: var(--bg-main); color: var(--text-dark); line-height: 1.6; overflow-x: hidden; }
+
+        /* --- TYPOGRAPHY & UTILITIES --- */
+        h1, h2, h3, .logo { font-family: var(--font-serif); font-weight: 600; }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 5%; }
+        .section-padding { padding: 6rem 0; }
+        .text-center { text-align: center; }
         
-        /* Header styling */
-        header { 
-            background-color: #ff6b6b; 
-            padding: 1.2rem 2rem; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+        .btn {
+            display: inline-block; padding: 1rem 2.5rem; background: var(--primary); color: white;
+            border: none; border-radius: 4px; font-size: 0.9rem; font-weight: 500; text-transform: uppercase;
+            letter-spacing: 1px; cursor: pointer; transition: var(--transition); text-decoration: none;
         }
-        .cart-box {
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 0.5rem 1.2rem;
-            border-radius: 20px;
-            font-weight: bold;
-            transition: transform 0.2s;
-        }
-        .cart-box.bounce { transform: scale(1.15); }
+        .btn:hover { background: var(--accent); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
 
-        /* Hero Section */
-        .hero { 
-            background: linear-gradient(135deg, #4ecdc4, #2ab7ca); 
-            color: white; 
-            text-align: center; 
-            padding: 6rem 1rem; 
-            box-shadow: inset 0 -10px 20px rgba(0,0,0,0.05);
+        /* --- GLASSMORPHISM HEADER --- */
+        header {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0,0,0,0.05); transition: var(--transition);
         }
-        .hero h1 { font-size: 3rem; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
-        .hero p { font-size: 1.3rem; opacity: 0.9; }
-
-        /* Main Container */
-        .container { max-width: 1200px; margin: 3rem auto; padding: 0 1.5rem; }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; height: 80px; }
+        .logo { font-size: 1.8rem; color: var(--primary); cursor: pointer; letter-spacing: -0.5px; }
+        .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+        .nav-link { color: var(--text-dark); text-decoration: none; font-size: 0.95rem; font-weight: 500; position: relative; cursor: pointer; }
+        .nav-link::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: var(--accent); transition: var(--transition); }
+        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
         
-        .section-title {
-            text-align: center;
-            margin-bottom: 2rem;
-            font-size: 2rem;
-            color: #ff6b6b;
+        .cart-trigger { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500; }
+        .cart-count { background: var(--accent); color: white; font-size: 0.75rem; padding: 2px 8px; border-radius: 20px; }
+
+        /* --- SPA ROUTING SETUP --- */
+        .page-view { display: none; opacity: 0; animation: fadeIn 0.6s forwards; padding-top: 80px; min-height: 80vh; }
+        .page-view.active { display: block; }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        /* --- HERO SECTION (HOME) --- */
+        .hero { display: grid; grid-template-columns: 1fr 1fr; min-height: 90vh; background: var(--bg-alt); }
+        .hero-content { display: flex; flex-direction: column; justify-content: center; padding: 5%; }
+        .hero-label { text-transform: uppercase; letter-spacing: 3px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; }
+        .hero h1 { font-size: 4rem; line-height: 1.1; margin-bottom: 1.5rem; color: var(--primary); }
+        .hero p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 2.5rem; max-width: 480px; }
+        .hero-image {
+            background-image: url('https://images.unsplash.com/photo-1599623560574-39d485900c95?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover; background-position: center;
         }
 
-        /* Toy Grid Cards */
-        .toy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2.5rem; margin-top: 2rem; }
-        .toy-card { 
-            background: white; 
-            border-radius: 16px; 
-            text-align: center; 
-            box-shadow: 0 8px 16px rgba(0,0,0,0.06); 
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-        .toy-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.12);
-        }
-        .toy-img-container {
-            width: 100%;
-            height: 220px;
-            overflow: hidden;
-            background-color: #f5f5f5;
-        }
-        .toy-img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-        .toy-card:hover .toy-img {
-            transform: scale(1.08);
-        }
-        .toy-info {
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            justify-content: space-between;
-        }
-        .toy-info h3 { font-size: 1.4rem; margin-bottom: 0.5rem; color: #333; }
-        .price { font-size: 1.2rem; font-weight: bold; color: #2ab7ca; margin-bottom: 1rem; }
+        /* --- PRODUCT GRID --- */
+        .section-header { text-align: center; margin-bottom: 4rem; }
+        .section-header h2 { font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem; }
+        .section-header p { color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2.5rem; }
+        .product-card { background: white; border-radius: 8px; overflow: hidden; transition: var(--transition); border: 1px solid var(--border-color); position: relative; }
+        .product-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); }
+        .product-img-wrap { width: 100%; height: 300px; overflow: hidden; background: #f9f9f9; }
+        .product-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s ease; }
+        .product-card:hover .product-img { transform: scale(1.05); }
+        .product-info { padding: 1.5rem; }
+        .product-category { font-size: 0.75rem; text-transform: uppercase; color: var(--accent); letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .product-title { font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .product-price { font-weight: 600; color: var(--text-muted); margin-bottom: 1.5rem; }
+        .btn-full { width: 100%; text-align: center; }
+
+        /* --- ABOUT / LEGACY PAGE --- */
+        .story-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; margin-bottom: 6rem; }
+        .story-grid.reverse { grid-template-columns: 1.2fr 0.8fr; }
+        .story-img { width: 100%; border-radius: 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .story-content h2 { font-size: 2.5rem; margin-bottom: 1.5rem; color: var(--primary); }
+        .story-content p { margin-bottom: 1.5rem; color: var(--text-muted); font-size: 1.05rem; }
+
+        /* --- TESTIMONIALS --- */
+        .testimonials { background: var(--bg-alt); }
+        .review-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .review-card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
+        .stars { color: var(--accent); margin-bottom: 1rem; letter-spacing: 2px; }
+        .review-text { font-style: italic; color: var(--text-muted); margin-bottom: 1.5rem; }
+        .reviewer { font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- FAQ SECTION --- */
+        .faq-container { max-width: 800px; margin: 0 auto; }
+        .faq-item { border-bottom: 1px solid var(--border-color); padding: 1.5rem 0; }
+        .faq-question { display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 600; font-size: 1.1rem; }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; color: var(--text-muted); margin-top: 0; opacity: 0; }
+        .faq-item.active .faq-answer { max-height: 200px; margin-top: 1rem; opacity: 1; transition: all 0.4s ease; }
+        .faq-toggle { font-size: 1.5rem; transition: transform 0.3s ease; }
+        .faq-item.active .faq-toggle { transform: rotate(45deg); color: var(--accent); }
+
+        /* --- CONTACT SECTION --- */
+        .contact-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 4rem; }
+        .contact-info h3 { margin-bottom: 1.5rem; }
+        .info-block { margin-bottom: 2rem; color: var(--text-muted); }
+        .info-block strong { display: block; color: var(--text-dark); margin-bottom: 0.2rem; }
         
-        .btn { 
-            background: #ff6b6b; 
-            color: white; 
-            border: none; 
-            padding: 0.7rem 1.5rem; 
-            border-radius: 25px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 1rem;
-            transition: background 0.2s, transform 0.1s;
-            width: 100%;
-        }
-        .btn:hover { background: #ee5252; }
-        .btn:active { transform: scale(0.98); }
+        .contact-form { background: white; padding: 3rem; border-radius: 8px; border: 1px solid var(--border-color); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .form-group.full { grid-column: 1 / -1; }
+        label { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+        input, textarea { padding: 1rem; border: 1px solid var(--border-color); border-radius: 4px; font-family: inherit; background: var(--bg-main); transition: var(--transition); }
+        input:focus, textarea:focus { outline: none; border-color: var(--accent); background: white; }
 
-        /* Video Showcase Section */
-        .video-section {
-            background-color: white;
-            padding: 4rem 1.5rem;
-            margin-top: 4rem;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.02);
+        /* --- CART SIDEBAR --- */
+        .cart-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1500; opacity: 0; visibility: hidden; transition: var(--transition); backdrop-filter: blur(4px); }
+        .cart-overlay.active { opacity: 1; visibility: visible; }
+        .cart-sidebar { position: fixed; top: 0; right: -450px; width: 450px; height: 100%; background: white; z-index: 2000; box-shadow: -10px 0 30px rgba(0,0,0,0.1); transition: var(--transition); display: flex; flex-direction: column; }
+        .cart-sidebar.active { right: 0; }
+        
+        .cart-header { padding: 2rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .cart-close { background: none; border: none; font-size: 2rem; cursor: pointer; color: var(--text-muted); transition: color 0.2s; }
+        .cart-close:hover { color: var(--primary); }
+        
+        .cart-body { padding: 2rem; flex-grow: 1; overflow-y: auto; }
+        .cart-empty { text-align: center; color: var(--text-muted); margin-top: 2rem; font-style: italic; }
+        .cart-item { display: flex; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
+        .cart-item-img { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; }
+        .cart-item-details { flex-grow: 1; }
+        .cart-item-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.2rem; }
+        .cart-item-price { color: var(--accent); font-weight: 600; }
+        .remove-item { font-size: 0.8rem; color: var(--text-muted); text-decoration: underline; cursor: pointer; background: none; border: none; margin-top: 0.5rem; }
+        
+        .cart-footer { padding: 2rem; border-top: 1px solid var(--border-color); background: var(--bg-main); }
+        .cart-total { display: flex; justify-content: space-between; font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; font-family: var(--font-serif); }
+
+        /* --- FOOTER --- */
+        footer { background: var(--primary); color: white; padding: 5rem 0 2rem; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 4rem; margin-bottom: 4rem; }
+        .footer-brand h3 { font-family: var(--font-serif); font-size: 1.8rem; margin-bottom: 1rem; color: white; }
+        .footer-brand p { color: #A0B2C6; font-size: 0.95rem; max-width: 300px; }
+        .footer-links h4 { font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1.5rem; color: var(--accent); }
+        .footer-links ul { list-style: none; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a { color: #A0B2C6; text-decoration: none; transition: color 0.2s; font-size: 0.95rem; }
+        .footer-links a:hover { color: white; }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); color: #A0B2C6; font-size: 0.85rem; }
+
+        /* --- SCROLL ANIMATIONS --- */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 992px) {
+            .hero { grid-template-columns: 1fr; min-height: 60vh; }
+            .hero-image { height: 40vh; }
+            .hero h1 { font-size: 3rem; }
+            .story-grid, .story-grid.reverse, .contact-layout { grid-template-columns: 1fr; gap: 2rem; }
+            .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+            .cart-sidebar { width: 100%; right: -100%; }
         }
-        .video-container {
-            max-width: 800px;
-            margin: 0 auto;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            position: relative;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
-        }
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 0;
+        @media (max-width: 768px) {
+            .nav-links { display: none; /* In a full build, add a hamburger menu here */ }
+            .form-row { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
+    <!-- NAVIGATION -->
     <header>
-        <h2>🧸 Teddy & Co.</h2>
-        <div class="cart-box" id="cart">Cart (0)</div>
+        <div class="container nav-container">
+            <div class="logo" onclick="navigate('home')">Teddy & Co.</div>
+            <ul class="nav-links">
+                <li><a class="nav-link active" data-target="home">Home</a></li>
+                <li><a class="nav-link" data-target="shop">The Collection</a></li>
+                <li><a class="nav-link" data-target="about">Our Legacy</a></li>
+                <li><a class="nav-link" data-target="contact">Contact & FAQ</a></li>
+            </ul>
+            <div class="cart-trigger" onclick="toggleCart()">
+                <span>Cart</span>
+                <span class="cart-count" id="cartBadge">0</span>
+            </div>
+        </div>
     </header>
 
-    <section class="hero">
-        <h1>The Ultimate Toy Store is Live!</h1>
-        <p>Explore our premium, interactive collection directly on GitHub Pages.</p>
-    </section>
-
-    <main class="container">
-        <h2 class="section-title">Featured Toys</h2>
-        <div class="toy-grid">
-            <!-- Toy 1 -->
-            <div class="toy-card">
-                <div class="toy-img-container">
-                    <img class="toy-img" src="https://images.unsplash.com/photo-1534447677768-be436bb09401?w=500&q=80" alt="Wooden Rocket Ship">
-                </div>
-                <div class="toy-info">
-                    <div>
-                        <h3>Retro Rocket Ship</h3>
-                        <p class="price">$24.99</p>
-                    </div>
-                    <button class="btn add-to-cart">Add to Cart</button>
-                </div>
-            </div>
-
-            <!-- Toy 2 -->
-            <div class="toy-card">
-                <div class="toy-img-container">
-                    <img class="toy-img" src="https://images.unsplash.com/photo-1559251606-c623743a6d76?w=500&q=80" alt="Classic Teddy Bear">
-                </div>
-                <div class="toy-info">
-                    <div>
-                        <h3>Classic Teddy Bear</h3>
-                        <p class="price">$19.99</p>
-                    </div>
-                    <button class="btn add-to-cart">Add to Cart</button>
-                </div>
-            </div>
-
-            <!-- Toy 3 -->
-            <div class="toy-card">
-                <div class="toy-img-container">
-                    <img class="toy-img" src="https://images.unsplash.com/photo-1515488042361-404e9250afef?w=500&q=80" alt="Wooden Train Set">
-                </div>
-                <div class="toy-info">
-                    <div>
-                        <h3>Vintage Train Set</h3>
-                        <p class="price">$34.99</p>
-                    </div>
-                    <button class="btn add-to-cart">Add to Cart</button>
-                </div>
-            </div>
+    <!-- SHOPPING CART SIDEBAR -->
+    <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Your Selection</h3>
+            <button class="cart-close" onclick="toggleCart()">&times;</button>
         </div>
+        <div class="cart-body" id="cartBody">
+            <div class="cart-empty">Your cart is currently empty.</div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Subtotal</span>
+                <span id="cartTotal">$0.00</span>
+            </div>
+            <button class="btn btn-full" onclick="checkout()">Proceed to Secure Checkout</button>
+        </div>
+    </div>
+
+    <!-- PAGE: HOME -->
+    <main id="home" class="page-view active">
+        <section class="hero">
+            <div class="hero-content">
+                <span class="hero-label">Est. 1982 | Copenhagen</span>
+                <h1>Toys crafted for generations.</h1>
+                <p>Discover our curated collection of sustainable, heirloom-quality wooden toys and organic plush companions.</p>
+                <div>
+                    <button class="btn" onclick="navigate('shop')">Shop the Collection</button>
+                </div>
+            </div>
+            <div class="hero-image"></div>
+        </section>
+
+        <section class="section-padding container">
+            <div class="section-header reveal">
+                <h2>Featured Masterpieces</h2>
+                <p>Hand-carved and naturally dyed. Designed to inspire unstructured, imaginative play.</p>
+            </div>
+            <div class="product-grid" id="featuredProducts">
+                <!-- Dynamically populated by JS -->
+            </div>
+        </section>
+
+        <section class="section-padding testimonials reveal">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Words from our Patrons</h2>
+                </div>
+                <div class="review-grid">
+                    <div class="review-card">
+                        <div class="stars">★★★★★</div>
+                        <p class="review-text">"The craftsmanship is unparalleled. The wooden rocket ship feels heavy, sturdy, and entirely safe. It has become a permanent fixture in our living room."</p>
+                        <span class="reviewer">— Eleanor R., London</span>
+                    </div>
+                    <div class="review-card">
+                        <div class="stars">★★★★★</div>
+                        <p class="review-text">"I bought the classic bear for my newborn. Knowing it's made from 100% organic, dye-free cotton gives me complete peace of mind. Truly an heirloom."</p>
+                        <span class="reviewer">— James T., New York</span>
+                    </div>
+                    <div class="review-card">
+                        <div class="stars">★★★★★</div>
+                        <p class="review-text">"Beautiful minimalist designs. They don't just look incredible on the shelf; they actually engage my children's problem-solving skills."</p>
+                        <span class="reviewer">— Sofia M., Milan</span>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <!-- Video Section -->
-    <section class="video-section">
-        <h2 class="section-title">See Our Toys in Action</h2>
-        <div class="video-container">
-            <!-- Embedded YouTube Video -->
-            <iframe src="https://www.youtube.com/embed/Z57EPrCWe38" title="Toy Store Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <!-- PAGE: SHOP (FULL CATALOG) -->
+    <main id="shop" class="page-view">
+        <section class="section-padding container">
+            <div class="section-header reveal">
+                <h2>The Complete Collection</h2>
+                <p>Explore our full range of certified non-toxic, sustainably sourced play essentials.</p>
+            </div>
+            <div class="product-grid" id="fullCatalog">
+                <!-- Dynamically populated by JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- PAGE: OUR LEGACY (ABOUT) -->
+    <main id="about" class="page-view">
+        <section class="section-padding container">
+            <div class="story-grid reveal">
+                <img src="https://images.unsplash.com/photo-1500964757637-c85e8a162699?auto=format&fit=crop&w=800&q=80" alt="Woodworking" class="story-img">
+                <div class="story-content">
+                    <h2>Our Heritage</h2>
+                    <p>Founded in a small Copenhagen workshop in 1982 by master carpenter Lars Jensen, Teddy & Co. was born out of a simple frustration: the rise of brittle, mass-produced plastic toys that lacked soul and durability.</p>
+                    <p>Lars believed that toys should be tactile, safe, and beautiful enough to pass down to grandchildren. Today, we maintain his rigorous standards, employing traditional joinery techniques and hand-finishing every piece.</p>
+                </div>
+            </div>
+            
+            <div class="story-grid reverse reveal">
+                <div class="story-content">
+                    <h2>Uncompromising Materials</h2>
+                    <p>We source 100% of our timber from FSC-certified sustainable European forests. Our plush companions are stitched from Global Organic Textile Standard (GOTS) certified cotton, ensuring zero exposure to harmful pesticides.</p>
+                    <p>Instead of toxic varnishes, we use natural beeswax and food-grade linseed oils. We don't just build toys; we build safe, tactile environments for cognitive development.</p>
+                </div>
+                <img src="https://images.unsplash.com/photo-1559251606-c623743a6d76?auto=format&fit=crop&w=800&q=80" alt="Organic Bear" class="story-img">
+            </div>
+        </section>
+    </main>
+
+    <!-- PAGE: CONTACT & FAQ -->
+    <main id="contact" class="page-view">
+        <section class="section-padding container">
+            <div class="section-header reveal">
+                <h2>Client Services & Inquiries</h2>
+                <p>Whether you require assistance with a bespoke order or have questions about our materials, our concierge team is here.</p>
+            </div>
+            
+            <div class="contact-layout reveal">
+                <div class="contact-info">
+                    <h3>Direct Contact</h3>
+                    <div class="info-block">
+                        <strong>Atelier & Flagship Store</strong>
+                        Nyhavn 17, 1051<br>
+                        Copenhagen, Denmark
+                    </div>
+                    <div class="info-block">
+                        <strong>Global Support</strong>
+                        concierge@teddyandco.com<br>
+                        +45 33 12 34 56
+                    </div>
+                    <div class="info-block">
+                        <strong>Operating Hours</strong>
+                        Monday - Friday<br>
+                        09:00 - 17:00 (CET)
+                    </div>
+                </div>
+
+                <form class="contact-form" onsubmit="submitForm(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fname">First Name</label>
+                            <input type="text" id="fname" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lname">Last Name</label>
+                            <input type="text" id="lname" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group full">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group full">
+                            <label for="message">Your Message</label>
+                            <textarea id="message" rows="5" required></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">Submit Inquiry</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="section-padding container bg-alt reveal">
+            <div class="section-header">
+                <h2>Frequently Asked Questions</h2>
+            </div>
+            <div class="faq-container">
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-question">Do you ship internationally? <span class="faq-toggle">+</span></div>
+                    <div class="faq-answer">Yes, we provide fully tracked, climate-neutral shipping to over 40 countries worldwide. European deliveries take 2-4 days, while international freight takes 5-10 business days.</div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-question">Are the dyes completely safe if chewed? <span class="faq-toggle">+</span></div>
+                    <div class="faq-answer">Absolutely. We strictly use plant-based, water-soluble pigments and seal our wooden toys with organic beeswax. They meet and exceed all European (EN71) and US (ASTM F963) safety standards.</div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-question">What is your return policy? <span class="faq-toggle">+</span></div>
+                    <div class="faq-answer">We offer a 30-day "no questions asked" return window for any unused items in their original packaging. We also offer a lifetime warranty against structural manufacturing defects.</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3>Teddy & Co.</h3>
+                    <p>Preserving the art of traditional play through sustainable craftsmanship and ethical design.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Collections</h4>
+                    <ul>
+                        <li><a href="#" onclick="navigate('shop')">Wooden Vehicles</a></li>
+                        <li><a href="#" onclick="navigate('shop')">Organic Plush</a></li>
+                        <li><a href="#" onclick="navigate('shop')">Montessori Sets</a></li>
+                        <li><a href="#" onclick="navigate('shop')">Nursery Decor</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>The Brand</h4>
+                    <ul>
+                        <li><a href="#" onclick="navigate('about')">Our Story</a></li>
+                        <li><a href="#" onclick="navigate('about')">Sustainability</a></li>
+                        <li><a href="#" onclick="navigate('contact')">Journal</a></li>
+                        <li><a href="#" onclick="navigate('contact')">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#" onclick="navigate('contact')">Contact Us</a></li>
+                        <li><a href="#" onclick="navigate('contact')">Shipping & Returns</a></li>
+                        <li><a href="#" onclick="navigate('contact')">Care Guide</a></li>
+                        <li><a href="#" onclick="navigate('contact')">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2026 Teddy & Co. Artisan Toys. All Rights Reserved.
+            </div>
         </div>
-    </section>
+    </footer>
 
+    <!-- LOGIC -->
     <script>
-        // Simple Interactive Cart Logic
-        let cartCount = 0;
-        const cartElement = document.getElementById('cart');
-        const buttons = document.querySelectorAll('.add-to-cart');
+        // --- PRODUCT DATA ARCHITECTURE ---
+        const products = [
+            { id: 1, name: "The Heritage Rocket", category: "Wooden Toys", price: 45.00, img: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&q=80", featured: true },
+            { id: 2, name: "Organic Sleepy Bear", category: "Plush", price: 38.00, img: "https://images.unsplash.com/photo-1559251606-c623743a6d76?w=600&q=80", featured: true },
+            { id: 3, name: "Nordic Train Set", category: "Wooden Toys", price: 65.00, img: "https://images.unsplash.com/photo-1515488042361-404e9250afef?w=600&q=80", featured: true },
+            { id: 4, name: "Montessori Sorting Blocks", category: "Educational", price: 28.00, img: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=600&q=80", featured: false },
+            { id: 5, name: "Classic Rocking Horse", category: "Furniture", price: 185.00, img: "https://images.unsplash.com/photo-1522771731470-42023d53b216?w=600&q=80", featured: false },
+            { id: 6, name: "Hand-knit Bunny", category: "Plush", price: 32.00, img: "https://images.unsplash.com/photo-1560854611-6b455dc2da65?w=600&q=80", featured: false }
+        ];
 
-        buttons.forEach(button => {
-            button.addEventListener('click', () => {
-                cartCount++;
-                cartElement.textContent = `Cart (${cartCount})`;
-                
-                // Add a quick visual bounce animation to the cart badge
-                cartElement.classList.add('bounce');
-                setTimeout(() => {
-                    cartElement.classList.remove('bounce');
-                }, 200);
+        let cart = [];
+
+        // --- INIT RENDERING ---
+        function renderProducts() {
+            const createCard = (p) => `
+                <div class="product-card">
+                    <div class="product-img-wrap">
+                        <img src="${p.img}" alt="${p.name}" class="product-img">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">${p.category}</div>
+                        <h3 class="product-title">${p.name}</h3>
+                        <div class="product-price">$${p.price.toFixed(2)}</div>
+                        <button class="btn btn-outline btn-full" onclick="addToCart(${p.id})">Add to Bag</button>
+                    </div>
+                </div>`;
+
+            document.getElementById('featuredProducts').innerHTML = products.filter(p => p.featured).map(createCard).join('');
+            document.getElementById('fullCatalog').innerHTML = products.map(createCard).join('');
+        }
+
+        // --- CART LOGIC ---
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            cart.push(product);
+            updateCartUI();
+            
+            // Notification animation
+            const badge = document.getElementById('cartBadge');
+            badge.style.transform = 'scale(1.5)';
+            setTimeout(() => badge.style.transform = 'scale(1)', 200);
+            
+            // Auto open cart
+            if(!document.getElementById('cartSidebar').classList.contains('active')) toggleCart();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            document.getElementById('cartBadge').innerText = cart.length;
+            const body = document.getElementById('cartBody');
+            
+            if (cart.length === 0) {
+                body.innerHTML = '<div class="cart-empty">Your cart is currently empty.</div>';
+                document.getElementById('cartTotal').innerText = "$0.00";
+                return;
+            }
+
+            let html = '';
+            let total = 0;
+            cart.forEach((item, index) => {
+                total += item.price;
+                html += `
+                    <div class="cart-item">
+                        <img src="${item.img}" class="cart-item-img" alt="${item.name}">
+                        <div class="cart-item-details">
+                            <div class="cart-item-title">${item.name}</div>
+                            <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+                            <button class="remove-item" onclick="removeFromCart(${index})">Remove</button>
+                        </div>
+                    </div>`;
             });
+
+            body.innerHTML = html;
+            document.getElementById('cartTotal').innerText = `$${total.toFixed(2)}`;
+        }
+
+        function toggleCart() {
+            document.getElementById('cartSidebar').classList.toggle('active');
+            document.getElementById('cartOverlay').classList.toggle('active');
+        }
+
+        function checkout() {
+            if(cart.length === 0) return alert("Your cart is empty.");
+            alert("Redirecting to secure payment gateway... (Simulation complete)");
+            cart = [];
+            updateCartUI();
+            toggleCart();
+        }
+
+        // --- SPA ROUTING ---
+        function navigate(pageId) {
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if(link.dataset.target === pageId) link.classList.add('active');
+            });
+
+            // Update page views
+            document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+            
+            // Re-trigger scroll animations for new view
+            setTimeout(reveal, 100);
+        }
+
+        // --- INTERACTIVITY ---
+        function toggleFaq(element) {
+            element.classList.toggle('active');
+        }
+
+        function submitForm(e) {
+            e.preventDefault();
+            alert("Thank you. Your inquiry has been received by our concierge team.");
+            e.target.reset();
+        }
+
+        // --- SCROLL ANIMATIONS (Intersection Observer Alternative) ---
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+
+        // --- BOOTSTRAP APP ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            
+            // Bind nav clicks (for mobile/desktop dynamic binding if needed)
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => navigate(e.target.dataset.target));
+            });
+            
+            reveal(); // Initial trigger
         });
     </script>
 </body>
